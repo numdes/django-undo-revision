@@ -1,16 +1,53 @@
 [project]
 name = "django-undo-revision"
-version = "1.0.0"
+version = "1.0.1"
 description = "Django reusable app for revision-based undo functionality with django-simple-history"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
+authors = [
+    { name = "Eduard Charsov", email = "info@numdes.com" },
+]
+maintainers = [
+    { name = "numdes", email = "info@numdes.com" },
+]
+keywords = [
+    "django",
+    "undo",
+    "revision",
+    "history",
+    "rollback",
+    "django-simple-history",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "django>=4.2",
     "django-simple-history>=3.11.0",
     "deepdiff>=8.0.0",
     "typing-extensions>=4.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/numdes/django-undo-revision"
+Repository = "https://github.com/numdes/django-undo-revision"
+"Bug Tracker" = "https://github.com/numdes/django-undo-revision/issues"
+Changelog = "https://github.com/numdes/django-undo-revision/releases"
 
 [build-system]
 requires = ["hatchling"]
