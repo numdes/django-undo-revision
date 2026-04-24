@@ -37,7 +37,7 @@ class Version(models.Model):
     revision = models.ForeignKey(Revision, on_delete=models.CASCADE)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.UUIDField()
+    object_id = models.TextField()
     content_object = GenericForeignKey()
 
     def __str__(self):

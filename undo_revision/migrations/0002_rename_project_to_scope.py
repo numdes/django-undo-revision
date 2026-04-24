@@ -1,4 +1,5 @@
 from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
@@ -11,5 +12,10 @@ class Migration(migrations.Migration):
             model_name="revision",
             old_name="project",
             new_name="scope",
+        ),
+        migrations.AlterField(
+            model_name="version",
+            name="object_id",
+            field=models.TextField(),
         ),
     ]

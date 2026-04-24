@@ -1,6 +1,7 @@
 import contextlib
 
 from collections.abc import Generator
+from typing import Any
 from typing import overload
 from uuid import UUID
 
@@ -9,13 +10,13 @@ from undo_revision.revision.state import revision_id_ctx_var
 
 
 @overload
-def open_revision(*, scope_id: UUID) -> contextlib.AbstractContextManager[Revision]: ...
+def open_revision(*, scope_id: Any) -> contextlib.AbstractContextManager[Revision]: ...
 @overload
 def open_revision(*, revision_id: UUID) -> contextlib.AbstractContextManager[Revision]: ...
 
 
 @contextlib.contextmanager
-def open_revision(*, scope_id: UUID | None = None, revision_id: UUID | None = None) -> Generator[Revision, None, None]:
+def open_revision(*, scope_id: Any = None, revision_id: UUID | None = None) -> Generator[Revision, None, None]:
     if scope_id is not None and revision_id is not None:
         raise ValueError("Cannot pass both scope_id and revision_id at the same time.")
 
