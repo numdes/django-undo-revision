@@ -4,7 +4,7 @@ A Django reusable app for revision-based undo functionality, built on top of [dj
 
 ## How it works
 
-Every mutation is wrapped in a **revision** — a unit that can be rolled back atomically with a single `undo_last_revision(project)` call. A revision automatically groups all historical records (creates, updates, deletes) made within its context.
+Every mutation is wrapped in a **revision** — a unit that can be rolled back atomically with a single `undo_last_revision(scope)` call. A revision automatically groups all historical records (creates, updates, deletes) made within its context.
 
 ## Installation
 
@@ -31,13 +31,13 @@ python manage.py migrate
 
 ## Configuration
 
-In `settings.py`, set the project model (the entity revisions are scoped to):
+In `settings.py`, set the scope model (the entity revisions are scoped to — can be a project, user, session, or any model):
 
 ```python
-UNDO_REVISION_PROJECT_MODEL = "myapp.Project"  # required
+UNDO_REVISION_SCOPE_MODEL = "myapp.Project"  # required
 
-# URL kwarg used by UndoRevisionMixin to extract the project id
-UNDO_REVISION_PROJECT_URL_KWARG = "project_id"
+# URL kwarg used by UndoRevisionMixin to extract the scope id
+UNDO_REVISION_SCOPE_URL_KWARG = "project_id"
 
 # HTTP methods that should open a revision (default: all mutating methods)
 UNDO_REVISION_HTTP_METHODS = ["post", "put", "patch", "delete"]
@@ -63,7 +63,7 @@ class Document(HistoricalModel):
 ```python
 from undo_revision.revision.context import open_revision
 
-with open_revision(project_id=project.id):
+with open_revision(scope_id=project.id):
     doc.title = "New title"
     doc.save()
     other_obj.delete()
@@ -78,12 +78,12 @@ If no changes were recorded inside the block, the revision is deleted automatica
 from undo_revision.revision.undo import undo_last_revision, RevisionNotFoundError
 
 try:
-    undo_last_revision(project)
+    undo_last_revision(scope=project)
 except RevisionNotFoundError:
     print("Nothing to undo")
 ```
 
-The function fetches the latest revision for the project and rolls back all its changes in reverse chronological order.
+The function fetches the latest revision for the scope and rolls back all its changes in reverse chronological order.
 
 ### 4. Auto-open revisions via mixin (DRF / CBV)
 
@@ -93,7 +93,7 @@ from rest_framework.viewsets import ModelViewSet
 
 
 class DocumentViewSet(UndoRevisionMixin, ModelViewSet):
-    project_url_kwarg = "project_id"  # URL kwarg carrying the project id
+    scope_url_kwarg = "project_id"  # URL kwarg carrying the scope id
     ...
 ```
 

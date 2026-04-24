@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        migrations.swappable_dependency(settings.UNDO_REVISION_PROJECT_MODEL),
+        migrations.swappable_dependency(settings.UNDO_REVISION_SCOPE_MODEL),
         ("contenttypes", "0001_initial"),
     ]
 
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 (
                     "project",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to=settings.UNDO_REVISION_PROJECT_MODEL
+                        on_delete=django.db.models.deletion.CASCADE, to=settings.UNDO_REVISION_SCOPE_MODEL
                     ),
                 ),
             ],

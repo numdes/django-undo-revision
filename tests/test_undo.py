@@ -17,7 +17,7 @@ def project():
 
 
 def test_undo_create(project):
-    with open_revision(project_id=project.id):
+    with open_revision(scope_id=project.id):
         doc = Document.objects.create(project=project, title="new")
 
     undo_last_revision(project)
@@ -28,7 +28,7 @@ def test_undo_create(project):
 def test_undo_update(project):
     doc = Document.objects.create(project=project, title="original")
 
-    with open_revision(project_id=project.id):
+    with open_revision(scope_id=project.id):
         doc.title = "updated"
         doc.save()
 
@@ -42,7 +42,7 @@ def test_undo_delete(project):
     doc = Document.objects.create(project=project, title="to_delete")
     doc_id = doc.id
 
-    with open_revision(project_id=project.id):
+    with open_revision(scope_id=project.id):
         doc.delete()
 
     undo_last_revision(project)
@@ -56,7 +56,7 @@ def test_undo_raises_if_no_revision(project):
 
 
 def test_undo_deletes_revision(project):
-    with open_revision(project_id=project.id) as revision:
+    with open_revision(scope_id=project.id) as revision:
         Document.objects.create(project=project, title="test")
 
     undo_last_revision(project)
@@ -68,7 +68,7 @@ def test_undo_multiple_objects(project):
     doc1 = Document.objects.create(project=project, title="a")
     doc2 = Document.objects.create(project=project, title="b")
 
-    with open_revision(project_id=project.id):
+    with open_revision(scope_id=project.id):
         doc1.title = "a_updated"
         doc1.save()
         doc2.title = "b_updated"

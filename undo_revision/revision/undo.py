@@ -16,18 +16,18 @@ class RevisionNotFoundError(Exception):
 
 
 @transaction.atomic
-def undo_last_revision(project):
-    revision = project.revision_set.order_by("created_at").last()
+def undo_last_revision(scope):
+    revision = scope.revision_set.order_by("created_at").last()
     if revision is None:
-        logger.debug("No revisions found for project id %s", project.id)
-        raise RevisionNotFoundError(f"Revision not found for project id={project.id}.")
+        logger.debug("No revisions found for scope id %s", scope.id)
+        raise RevisionNotFoundError(f"Revision not found for scope id={scope.id}.")
 
     content_objs = [v.content_object for v in revision.version_set.all()]
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(
-            "Undoing revision %s for project id %s. Found %s content objects: %s",
+            "Undoing revision %s for scope id %s. Found %s content objects: %s",
             revision.id,
-            project.id,
+            scope.id,
             len(content_objs),
             ", ".join(
                 f"{i}.{o.instance.__class__.__name__} '{o.history_type}'" for i, o in enumerate(content_objs, start=1)
@@ -50,5 +50,5 @@ def undo_last_revision(project):
         else:
             raise TypeError(f"Unknown history type: {content_obj.history_type}")
 
-    logger.debug("Deleting revision %s for project id %s", revision.id, project.id)
+    logger.debug("Deleting revision %s for scope id %s", revision.id, scope.id)
     revision.delete()

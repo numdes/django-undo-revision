@@ -15,4 +15,4 @@ DATABASES = {
     }
 }
 
-UNDO_REVISION_PROJECT_MODEL = "tests.Project"
+UNDO_REVISION_SCOPE_MODEL = "tests.Project"

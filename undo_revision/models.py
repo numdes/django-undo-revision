@@ -26,7 +26,7 @@ from undo_revision.revision.state import revision_id_ctx_var
 class Revision(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
-    project = models.ForeignKey(settings.UNDO_REVISION_PROJECT_MODEL, on_delete=models.CASCADE)
+    scope = models.ForeignKey(settings.UNDO_REVISION_SCOPE_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.pk)
