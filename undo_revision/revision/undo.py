@@ -1,10 +1,14 @@
 import logging
 
-from deepdiff.model import DoesNotExist
 from django.db import transaction
 
 
 logger = logging.getLogger(__name__)
+
+# django-simple-history history_type codes (simple_history/models.py CharField choices)
+HISTORY_TYPE_CHANGED = "~"
+HISTORY_TYPE_CREATED = "+"
+HISTORY_TYPE_DELETED = "-"
 
 
 class RevisionNotFoundError(Exception):
@@ -25,28 +29,26 @@ def undo_last_revision(project):
             revision.id,
             project.id,
             len(content_objs),
-            "".join([
-                f"{i}.{o.instance.__class__.__name__} '{o.history_type}' " for i, o in enumerate(content_objs, start=1)
-            ]),
+            ", ".join(
+                f"{i}.{o.instance.__class__.__name__} '{o.history_type}'" for i, o in enumerate(content_objs, start=1)
+            ),
         )
     for content_obj in sorted(content_objs, key=lambda v: v.history_date, reverse=True):
         instance = content_obj.instance
-        match content_obj.history_type:
-            case "~":
-                instance._state.adding = False
-                instance.save_without_historical_record()
-            case "+":
-                instance.skip_history_when_saving = True
-                try:
-                    instance.delete()
-                except DoesNotExist:
-                    logger.debug("Instance not found for deletion: %s. Skipping.", instance)
-                finally:
-                    del instance.skip_history_when_saving
-            case "-":
-                instance.save_without_historical_record()
-            case _:
-                raise TypeError(f"Unknown history type: {content_obj.history_type}")
+        history_type = content_obj.history_type
+        if history_type == HISTORY_TYPE_CHANGED:
+            instance._state.adding = False
+            instance.save_without_historical_record()
+        elif history_type == HISTORY_TYPE_CREATED:
+            instance.skip_history_when_saving = True
+            try:
+                instance.delete()
+            finally:
+                del instance.skip_history_when_saving
+        elif history_type == HISTORY_TYPE_DELETED:
+            instance.save_without_historical_record()
+        else:
+            raise TypeError(f"Unknown history type: {content_obj.history_type}")
 
     logger.debug("Deleting revision %s for project id %s", revision.id, project.id)
     revision.delete()

@@ -19,14 +19,14 @@ def open_revision(
     *, project_id: UUID | None = None, revision_id: UUID | None = None
 ) -> Generator[Revision, None, None]:
     if project_id is not None and revision_id is not None:
-        raise ValueError("Нельзя передать одновременно project_id и revision_id")
+        raise ValueError("Cannot pass both project_id and revision_id at the same time.")
 
     if revision_id is not None:
         revision = Revision.objects.get(id=revision_id)
     elif project_id is not None:
         revision = Revision.objects.create(project_id=project_id)
     else:
-        raise ValueError("Нужно передать project_id или revision_id")
+        raise ValueError("Must pass either project_id or revision_id.")
 
     token = revision_id_ctx_var.set(revision.id)
     try:

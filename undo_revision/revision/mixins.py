@@ -6,7 +6,7 @@ from django.conf import settings
 from undo_revision.revision.context import open_revision
 
 
-REVISION_HTTP_METHODS = getattr(settings, "UNDO_REVISION_HTTP_METHODS", None) or ["post", "put", "patch", "delete"]
+REVISION_HTTP_METHODS = getattr(settings, "UNDO_REVISION_HTTP_METHODS", ["post", "put", "patch", "delete"])
 
 
 class UndoRevisionMixin:
@@ -24,7 +24,12 @@ class UndoRevisionMixin:
 def _wrap_with_new_revision(func: Callable, project_url_kwarg: str | None) -> Callable:
     @wraps(func)
     def wrapper(request, *args, **kwargs):
-        assert project_url_kwarg in kwargs
+        if project_url_kwarg not in kwargs:
+            raise KeyError(
+                f"URL kwarg '{project_url_kwarg}' not found in kwargs. "
+                "Check that the URL pattern includes this kwarg and that "
+                "UndoRevisionMixin.project_url_kwarg (or UNDO_REVISION_PROJECT_URL_KWARG) is set correctly."
+            )
         with open_revision(project_id=kwargs[project_url_kwarg]):
             return func(request, *args, **kwargs)
 
