@@ -50,6 +50,7 @@ UNDO_REVISION_HTTP_METHODS = ["post", "put", "patch", "delete"]
 ```python
 from undo_revision.models import HistoricalModel
 
+
 class Document(HistoricalModel):
     title = models.CharField(max_length=255)
     body = models.TextField()
@@ -89,6 +90,7 @@ The function fetches the latest revision for the project and rolls back all its 
 ```python
 from undo_revision.revision.mixins import UndoRevisionMixin
 from rest_framework.viewsets import ModelViewSet
+
 
 class DocumentViewSet(UndoRevisionMixin, ModelViewSet):
     project_url_kwarg = "project_id"  # URL kwarg carrying the project id

@@ -1,6 +1,6 @@
 [project]
 name = "django-undo-revision"
-version = "1.0.1"
+version = "1.0.2"
 description = "Django reusable app for revision-based undo functionality with django-simple-history"
 readme = "README.md"
 license = "MIT"
@@ -39,7 +39,6 @@ classifiers = [
 dependencies = [
     "django>=4.2",
     "django-simple-history>=3.11.0",
-    "deepdiff>=8.0.0",
     "typing-extensions>=4.0.0",
 ]
 
