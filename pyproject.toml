@@ -1,6 +1,6 @@
 [project]
 name = "django-undo-revision"
-version = "2.0.0"
+version = "2.0.1"
 description = "Django reusable app for revision-based undo functionality with django-simple-history"
 readme = "README.md"
 license = "MIT"
