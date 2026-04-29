@@ -60,3 +60,20 @@ def test_bulk_update_without_history(project):
     Document.objects.bulk_update_without_history([doc], ["title"])
 
     assert doc.history.count() == 1
+
+
+def test_update_with_history(project):
+    doc = Document.objects.create(project=project, title="original")
+
+    Document.objects.filter(id=doc.id).update(title="updated")
+
+    expected_history_count = 2
+    assert doc.history.count() == expected_history_count
+
+
+def test_update_without_history(project):
+    doc = Document.objects.create(project=project, title="original")
+
+    Document.objects.filter(id=doc.id).update_without_history(title="updated")
+
+    assert doc.history.count() == 1

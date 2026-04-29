@@ -89,6 +89,12 @@ class VersionsHistoricalModel(models.Model):
 
 
 class RevisionQuerySet(models.QuerySet):
+    def _clone(self):
+        clone = super()._clone()
+        if hasattr(self, "_skip_simple_history_create"):
+            clone._skip_simple_history_create = self._skip_simple_history_create
+        return clone
+
     def delete_without_history(self):
         self._skip_simple_history_delete = True
         return self.delete()
@@ -105,6 +111,7 @@ class RevisionQuerySet(models.QuerySet):
     def bulk_update_with_history(self, objs, fields):
         with transaction.atomic(savepoint=False):
             old_objs = list(self.filter(pk__in=[obj.pk for obj in objs]))  # important to be before bulk_update
+            self._skip_simple_history_create = True
             rows_updated = self.bulk_update(objs, fields)
 
             history_manager = get_history_manager_for_model(self.model)
@@ -130,6 +137,24 @@ class RevisionQuerySet(models.QuerySet):
             update_fields,
             unique_fields,
         )
+
+    def update(self, **kwargs):
+        if getattr(self, "_skip_simple_history_create", False):
+            return super().update(**kwargs)
+
+        with transaction.atomic(savepoint=False):
+            old_objs = list(self)
+            rows_updated = super().update(**kwargs)
+
+        if old_objs:
+            history_manager = get_history_manager_for_model(self.model)
+            history_manager.bulk_history_create(old_objs, update=True)
+
+        return rows_updated
+
+    def update_without_history(self, **kwargs):
+        self._skip_simple_history_create = True
+        return self.update(**kwargs)
 
     def bulk_update_without_history(self, objs, fields, batch_size=None):
         self._skip_simple_history_create = True

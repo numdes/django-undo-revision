@@ -146,7 +146,6 @@ from undo_revision.revision.undo import undo_last_revision, RevisionNotFoundErro
 
 
 class ProjectViewSet(GenericViewSet):
-
     @action(detail=True, methods=["post"], url_path="undo")
     def undo(self, request, pk=None):
         project = self.get_object()
@@ -174,7 +173,19 @@ class DocumentViewSet(UndoRevisionMixin, ModelViewSet):
 
 Every `POST`, `PUT`, `PATCH`, and `DELETE` request to this viewset will automatically open a revision scoped to `project_id`.
 
-### 6. Bulk operations
+### 6. QuerySet `update()`
+
+`QuerySet.update()` bypasses Django's `post_save` signal, so `HistoricalModel` overrides it to capture history automatically:
+
+```python
+# History is saved automatically — no extra call needed
+Document.objects.filter(project=project).update(title="New title")
+
+# Skip history tracking explicitly
+Document.objects.filter(project=project).update_without_history(title="New title")
+```
+
+### 7. Bulk operations
 
 `RevisionQuerySet` exposes helpers for bulk mutations that integrate with revision tracking:
 
@@ -216,6 +227,7 @@ Each `Version` points to a `django-simple-history` historical record snapshot. O
 |---|---|
 | Atomic multi-model rollback | Group changes across many models into one revision and revert them all at once |
 | Scoped undo history | Each scope (project, user, session) has its own independent undo stack |
+| QuerySet `update()` tracking | `filter(...).update(...)` saves history automatically, no extra call needed |
 | Bulk operation tracking | `bulk_create` and `bulk_update` are revision-aware out of the box |
 | Zero-change revision cleanup | Revisions with no recorded changes are deleted automatically |
 | DRF / CBV integration | Drop-in mixin auto-opens a revision per request |
