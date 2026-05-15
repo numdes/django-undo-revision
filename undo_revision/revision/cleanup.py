@@ -26,7 +26,11 @@ def cleanup_revisions() -> None:
         if not issubclass(model, HistoricalModel):
             continue
 
-        deleted_count, _ = model.objects.all().delete()
+        history_model = getattr(model.history, "model", None)
+        if history_model is None:
+            continue
+
+        deleted_count, _ = history_model.objects.all().delete()
         historical_deleted_total += deleted_count
 
         logger.info(
