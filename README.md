@@ -203,6 +203,18 @@ MyModel.objects.filter(...).delete_without_history()
 
 Use the `_without_history` variants for seed data, migrations, or internal bookkeeping that shouldn't be undoable.
 
+### 8. Cleanup all revisions
+```python
+from undo_revision.revision.cleanup import cleanup_revisions
+
+cleanup_revisions()
+```
+The cleanup removes:
+- all records from `undo_revision.models.Revision`
+- all records from `undo_revision.models.Version`
+- all records from all subclasses of `undo_revision.models.HistoricalModel`
+
+
 ## Data model
 
 ```
