@@ -1,10 +1,8 @@
-# libs/django_undo_revision/services/cleanup.py
-
 import logging
 
 from django.apps import apps
 from django.db import transaction
-from undo_revision.models import Revision, Version
+from undo_revision.models import Revision, Version, HistoricalModel
 
 logger = logging.getLogger(__name__)
 
@@ -25,20 +23,15 @@ def cleanup_revisions() -> None:
     historical_deleted_total = 0
 
     for model in apps.get_models():
-        history_manager = getattr(model, "history", None)
-        if history_manager is None:
+        if not issubclass(model, HistoricalModel):
             continue
 
-        history_model = getattr(history_manager, "model", None)
-        if history_model is None:
-            continue
-
-        deleted_count, _ = history_model.objects.all().delete()
+        deleted_count, _ = model.objects.all().delete()
         historical_deleted_total += deleted_count
 
         logger.info(
             "Deleted historical records: model=%s count=%s",
-            history_model.__name__,
+            model.__name__,
             deleted_count,
         )
 
